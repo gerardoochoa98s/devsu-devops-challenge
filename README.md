@@ -1,7 +1,6 @@
 # DevOps Technical Test — Node.js API on Kubernetes
 
 [![CI/CD](https://github.com/lgochoa/devsu-devops-challenge/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/lgochoa/devsu-devops-challenge/actions/workflows/ci-cd.yml)
-[![CodeQL](https://github.com/lgochoa/devsu-devops-challenge/actions/workflows/ci-cd.yml/badge.svg?job=codeql)](https://github.com/lgochoa/devsu-devops-challenge/actions/workflows/ci-cd.yml)
 [![Terraform](https://github.com/lgochoa/devsu-devops-challenge/actions/workflows/terraform.yml/badge.svg)](https://github.com/lgochoa/devsu-devops-challenge/actions/workflows/terraform.yml)
 
 Technical test for a DevOps position. The repository takes the **`devsu-demo-devops-nodejs`**
@@ -414,6 +413,14 @@ kubectl wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
   --timeout=240s
+
+# 2b. Storage class for the PostgreSQL PVC (kind does not ship one by default)
+kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.37/deploy/local-path-storage.yaml
+kubectl wait --namespace local-path-storage \
+  --for=condition=available deployment/local-path-provisioner \
+  --timeout=180s
+kubectl patch storageclass local-path \
+  -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
 # 3. Namespace and secret
 kubectl apply -f k8s/base/namespace.yaml

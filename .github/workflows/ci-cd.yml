@@ -162,7 +162,7 @@ jobs:
                   exit-code: '1'
 
             - name: Upload Trivy results to the Security tab
-              if: always()
+              if: always() && hashFiles('trivy-results.sarif') != ''
               uses: github/codeql-action/upload-sarif@v3
               with:
                   sarif_file: trivy-results.sarif
@@ -189,6 +189,8 @@ jobs:
         permissions:
             contents: read
             packages: read
+        env:
+            IMAGE_TAG: sha-${{ github.sha }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -219,8 +221,17 @@ jobs:
                     --for=condition=available deployment/metrics-server \
                     --timeout=180s
 
+            - name: Install local-path provisioner
+              run: |
+                  kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.37/deploy/local-path-storage.yaml
+                  kubectl wait --namespace local-path-storage \
+                    --for=condition=available deployment/local-path-provisioner \
+                    --timeout=180s
+                  kubectl patch storageclass local-path \
+                    -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
             - name: Install kustomize
-              uses: imranismail/setup-kustomize@v2
+              uses: imranismail/setup-kustomize@v3.0.0
               with:
                   version: 5.6.0
 
