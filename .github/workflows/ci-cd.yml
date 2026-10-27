@@ -66,8 +66,7 @@ jobs:
                   if-no-files-found: warn
 
             - name: Dependency audit (informational)
-              continue-on-error: true
-              run: npm audit --omit=dev --audit-level=high
+              run: npm audit --omit=dev --audit-level=high || true
 
     codeql:
         name: CodeQL (SAST)
@@ -152,7 +151,7 @@ jobs:
                       BUILD_DATE=${{ steps.buildmeta.outputs.date }}
 
             - name: Scan image with Trivy (informational)
-              uses: aquasecurity/trivy-action@v0.28.0
+              uses: aquasecurity/trivy-action@v0.36.0
               with:
                   image-ref: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
                   format: sarif

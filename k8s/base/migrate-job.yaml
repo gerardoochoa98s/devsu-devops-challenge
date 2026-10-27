@@ -25,6 +25,35 @@ spec:
                 fsGroup: 1000
                 seccompProfile:
                     type: RuntimeDefault
+            initContainers:
+                - name: wait-for-db
+                  image: demo-devops-api:local
+                  imagePullPolicy: IfNotPresent
+                  command: ['node', 'scripts/wait-for-db.js']
+                  envFrom:
+                      - configMapRef:
+                            name: demo-devops-config
+                      - secretRef:
+                            name: demo-devops-db
+                  env:
+                      - name: DB_WAIT_ATTEMPTS
+                        value: '60'
+                  resources:
+                      requests:
+                          cpu: 10m
+                          memory: 32Mi
+                      limits:
+                          cpu: 100m
+                          memory: 64Mi
+                  securityContext:
+                      allowPrivilegeEscalation: false
+                      readOnlyRootFilesystem: true
+                      capabilities:
+                          drop:
+                              - ALL
+                  volumeMounts:
+                      - name: tmp
+                        mountPath: /tmp
             containers:
                 - name: migrate
                   image: demo-devops-api:local
