@@ -1,13 +1,13 @@
 # DevOps Technical Test — Node.js API on Kubernetes
 
-[![CI/CD](https://github.com/lgochoa/devsu-devops-challenge/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/lgochoa/devsu-devops-challenge/actions/workflows/ci-cd.yml)
-[![Terraform](https://github.com/lgochoa/devsu-devops-challenge/actions/workflows/terraform.yml/badge.svg)](https://github.com/lgochoa/devsu-devops-challenge/actions/workflows/terraform.yml)
+[![CI/CD](https://github.com/gerardoochoa98s/devsu-devops-challenge/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/gerardoochoa98s/devsu-devops-challenge/actions/workflows/ci-cd.yml)
+[![Terraform](https://github.com/gerardoochoa98s/devsu-devops-challenge/actions/workflows/terraform.yml/badge.svg)](https://github.com/gerardoochoa98s/devsu-devops-challenge/actions/workflows/terraform.yml)
 
 Technical test for a DevOps position. The repository takes the **`devsu-demo-devops-nodejs`**
 starter application and turns it into a containerized, tested and observable service deployed to
 Kubernetes by a CI/CD pipeline.
 
-- **Repository:** <https://github.com/lgochoa/devsu-devops-challenge>
+- **Repository:** <https://github.com/gerardoochoa98s/devsu-devops-challenge>
 - **Application:** Node.js 20 + Express + Sequelize
 - **Runtime target:** Docker + Kubernetes (kind locally/in CI, portable to EKS/AKS/GKE)
 
@@ -330,7 +330,7 @@ Workflow: [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml)
 
 Every run produces:
 
-- **Public run URL:** `https://github.com/lgochoa/devsu-devops-challenge/actions`
+- **Public run URL:** `https://github.com/gerardoochoa98s/devsu-devops-challenge/actions`
 - **`coverage-report` artifact:** coverage HTML/LCOV/JSON + JUnit XML.
 - **`k8s-evidence` artifact:** smoke test, HPA, pods, ingress, PDB, NetworkPolicies, logs and events.
 - **Job summary:** coverage table and Kubernetes deployment summary.
@@ -532,7 +532,7 @@ checkov (soft fail)
 
 | Evidence                       | Location                                                             |
 | ------------------------------ | -------------------------------------------------------------------- |
-| Pipeline runs                  | <https://github.com/lgochoa/devsu-devops-challenge/actions>          |
+| Pipeline runs                  | <https://github.com/gerardoochoa98s/devsu-devops-challenge/actions>  |
 | CI/CD workflow                 | [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml)         |
 | Terraform workflow             | [`.github/workflows/terraform.yml`](.github/workflows/terraform.yml) |
 | Coverage and JUnit reports     | `coverage-report` artifact of each run                               |

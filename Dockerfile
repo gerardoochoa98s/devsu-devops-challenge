@@ -20,7 +20,7 @@ LABEL org.opencontainers.image.title="demo-devops-nodejs" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${VCS_REF}" \
       org.opencontainers.image.created="${BUILD_DATE}" \
-      org.opencontainers.image.source="https://github.com/lgochoa/devsu-devops-challenge" \
+      org.opencontainers.image.source="https://github.com/gerardoochoa98s/devsu-devops-challenge" \
       org.opencontainers.image.licenses="UNLICENSED"
 
 # hadolint ignore=DL3008

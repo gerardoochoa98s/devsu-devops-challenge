@@ -6,7 +6,7 @@ resources:
 
 images:
     - name: demo-devops-api
-      newName: ghcr.io/lgochoa/devsu-devops-challenge
+      newName: ghcr.io/gerardoochoa98s/devsu-devops-challenge
       newTag: '1.0.0'
 
 patches:

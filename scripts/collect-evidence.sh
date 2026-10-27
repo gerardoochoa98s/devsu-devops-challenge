@@ -21,7 +21,7 @@ kubectl -n "${NAMESPACE}" get events --sort-by=.lastTimestamp \
     echo "- Generated: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
     echo "- Commit: ${GITHUB_SHA:-local}"
     echo "- Image: ${IMAGE_NAME:-local}:${IMAGE_TAG:-local}"
-    echo "- Workflow run: ${GITHUB_SERVER_URL:-https://github.com}/${GITHUB_REPOSITORY:-lgochoa}/actions/runs/${GITHUB_RUN_ID:-local}"
+    echo "- Workflow run: ${GITHUB_SERVER_URL:-https://github.com}/${GITHUB_REPOSITORY:-gerardoochoa98s}/actions/runs/${GITHUB_RUN_ID:-local}"
     echo
     echo "## Pods"
     echo

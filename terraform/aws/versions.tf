@@ -16,7 +16,7 @@ terraform {
   # Configure it with `terraform init -backend-config=...` or uncomment:
   #
   # backend "s3" {
-  #   bucket         = "lgochoa-terraform-state"
+  #   bucket         = "gerardoochoa98s-terraform-state"
   #   key            = "devsu-devops/eks/terraform.tfstate"
   #   region         = "us-east-1"
   #   dynamodb_table = "terraform-locks"

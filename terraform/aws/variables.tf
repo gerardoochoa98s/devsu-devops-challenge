@@ -24,7 +24,7 @@ variable "environment" {
 variable "repository_url" {
   description = "Repository URL included in resource tags."
   type        = string
-  default     = "https://github.com/lgochoa/devsu-devops-challenge"
+  default     = "https://github.com/gerardoochoa98s/devsu-devops-challenge"
 }
 
 variable "cluster_version" {

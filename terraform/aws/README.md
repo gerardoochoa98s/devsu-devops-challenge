@@ -85,7 +85,7 @@ DynamoDB table, then uncomment the backend block or run:
 
 ```bash
 terraform init \
-  -backend-config="bucket=lgochoa-terraform-state" \
+  -backend-config="bucket=gerardoochoa98s-terraform-state" \
   -backend-config="key=devsu-devops/eks/terraform.tfstate" \
   -backend-config="region=us-east-1" \
   -backend-config="dynamodb_table=terraform-locks" \
