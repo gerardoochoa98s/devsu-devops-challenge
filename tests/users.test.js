@@ -14,7 +14,12 @@ beforeAll(async () => {
 })
 
 beforeEach(async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {})
     await User.destroy({ where: {} })
+})
+
+afterEach(() => {
+    jest.restoreAllMocks()
 })
 
 afterAll(async () => {

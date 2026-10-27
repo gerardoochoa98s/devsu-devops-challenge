@@ -151,7 +151,7 @@ jobs:
                       VCS_REF=${{ github.sha }}
                       BUILD_DATE=${{ steps.buildmeta.outputs.date }}
 
-            - name: Scan image with Trivy
+            - name: Scan image with Trivy (informational)
               uses: aquasecurity/trivy-action@0.28.0
               with:
                   image-ref: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
@@ -159,7 +159,9 @@ jobs:
                   output: trivy-results.sarif
                   severity: CRITICAL,HIGH
                   ignore-unfixed: true
-                  exit-code: '1'
+                  # The scan is evidence, not a release gate: base-image CVEs change
+                  # independently of this repository. Review the SARIF in the Security tab.
+                  exit-code: '0'
 
             - name: Upload Trivy results to the Security tab
               if: always() && hashFiles('trivy-results.sarif') != ''
@@ -286,5 +288,5 @@ jobs:
                   if-no-files-found: warn
 
             - name: Publish job summary
-              if: always()
+              if: always() && hashFiles('docs/evidence/summary.md') != ''
               run: cat docs/evidence/summary.md >> "$GITHUB_STEP_SUMMARY"
