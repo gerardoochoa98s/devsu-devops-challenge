@@ -631,4 +631,4 @@ The deploy job writes a summary to the run page and captures:
 - [x] ADRs documenting the main decisions.
 - [x] Terraform module for AWS (extra credit, validated but not applied).
 - [ ] Public endpoint (not possible without a cloud account).
-- [ ] ZIP/RAR with all files (generated as a release artifact).
+- [x] ZIP/RAR with all files (`devsu-devops-challenge.zip`, delivered with the submission).
