@@ -1,0 +1,108 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+    name: default-deny-all
+    namespace: demo-devops
+spec:
+    podSelector: {}
+    policyTypes:
+        - Ingress
+        - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+    name: allow-dns
+    namespace: demo-devops
+spec:
+    podSelector: {}
+    policyTypes:
+        - Egress
+    egress:
+        - to:
+              - namespaceSelector:
+                    matchLabels:
+                        kubernetes.io/metadata.name: kube-system
+                podSelector:
+                    matchLabels:
+                        k8s-app: kube-dns
+          ports:
+              - protocol: UDP
+                port: 53
+              - protocol: TCP
+                port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+    name: allow-api-ingress
+    namespace: demo-devops
+spec:
+    podSelector:
+        matchLabels:
+            app.kubernetes.io/name: api
+    policyTypes:
+        - Ingress
+    ingress:
+        - from:
+              - namespaceSelector:
+                    matchLabels:
+                        kubernetes.io/metadata.name: ingress-nginx
+          ports:
+              - protocol: TCP
+                port: 8000
+        # kind routes kubelet probes from the node network (172.16.0.0/12).
+        # In a cloud cluster, replace this with the node/subnet CIDR or use exec probes.
+        - from:
+              - ipBlock:
+                    cidr: 172.16.0.0/12
+          ports:
+              - protocol: TCP
+                port: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+    name: allow-api-egress
+    namespace: demo-devops
+spec:
+    podSelector:
+        matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                  - api
+                  - migrate
+    policyTypes:
+        - Egress
+    egress:
+        - to:
+              - podSelector:
+                    matchLabels:
+                        app.kubernetes.io/name: postgres
+          ports:
+              - protocol: TCP
+                port: 5432
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+    name: allow-postgres-ingress
+    namespace: demo-devops
+spec:
+    podSelector:
+        matchLabels:
+            app.kubernetes.io/name: postgres
+    policyTypes:
+        - Ingress
+    ingress:
+        - from:
+              - podSelector:
+                    matchLabels:
+                        app.kubernetes.io/name: api
+              - podSelector:
+                    matchLabels:
+                        app.kubernetes.io/name: migrate
+          ports:
+              - protocol: TCP
+                port: 5432

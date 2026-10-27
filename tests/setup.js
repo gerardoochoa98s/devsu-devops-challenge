@@ -1,0 +1,5 @@
+process.env.NODE_ENV = 'test'
+process.env.DB_DIALECT = 'sqlite'
+process.env.DB_STORAGE = ':memory:'
+process.env.DB_LOGGING = 'false'
+process.env.APP_VERSION = 'test'

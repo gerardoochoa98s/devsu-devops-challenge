@@ -1,0 +1,13 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+    name: demo-devops-api
+    namespace: demo-devops
+    labels:
+        app.kubernetes.io/name: api
+        app.kubernetes.io/part-of: demo-devops
+spec:
+    minAvailable: 1
+    selector:
+        matchLabels:
+            app.kubernetes.io/name: api

@@ -1,0 +1,103 @@
+name: Terraform
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - 'terraform/**'
+            - '.github/workflows/terraform.yml'
+    pull_request:
+        branches:
+            - main
+        paths:
+            - 'terraform/**'
+            - '.github/workflows/terraform.yml'
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    validate:
+        name: Format, validate and lint
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        defaults:
+            run:
+                working-directory: terraform/aws
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up Terraform
+              uses: hashicorp/setup-terraform@v3
+              with:
+                  terraform_version: 1.9.8
+
+            - name: Terraform fmt
+              run: terraform fmt -check -recursive
+
+            - name: Terraform init
+              run: terraform init -backend=false -input=false
+
+            - name: Terraform validate
+              run: terraform validate
+
+            - name: Set up TFLint
+              uses: terraform-linters/setup-tflint@v4
+              with:
+                  tflint_version: latest
+
+            - name: TFLint
+              run: |
+                  tflint --init
+                  tflint --recursive
+
+            - name: Checkov
+              uses: bridgecrewio/checkov-action@master
+              with:
+                  directory: terraform
+                  framework: terraform
+                  output_format: cli
+                  soft_fail: true
+
+    plan:
+        name: Plan (optional, requires AWS credentials)
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        needs:
+            - validate
+        if: vars.ENABLE_AWS_PLAN == 'true'
+        defaults:
+            run:
+                working-directory: terraform/aws
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up Terraform
+              uses: hashicorp/setup-terraform@v3
+              with:
+                  terraform_version: 1.9.8
+
+            - name: Terraform init
+              run: terraform init -input=false
+
+            - name: Terraform plan
+              run: terraform plan -input=false -no-color -out=tfplan
+
+            - name: Render plan
+              run: terraform show -no-color tfplan > plan.txt
+
+            - name: Upload plan
+              uses: actions/upload-artifact@v4
+              with:
+                  name: terraform-plan
+                  path: terraform/aws/plan.txt
+                  retention-days: 14

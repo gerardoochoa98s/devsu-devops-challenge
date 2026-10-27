@@ -1,0 +1,140 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: demo-devops-api
+    namespace: demo-devops
+    labels:
+        app.kubernetes.io/name: api
+        app.kubernetes.io/part-of: demo-devops
+spec:
+    type: ClusterIP
+    selector:
+        app.kubernetes.io/name: api
+    ports:
+        - name: http
+          port: 80
+          targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: demo-devops-api
+    namespace: demo-devops
+    labels:
+        app.kubernetes.io/name: api
+        app.kubernetes.io/part-of: demo-devops
+spec:
+    replicas: 2
+    revisionHistoryLimit: 3
+    progressDeadlineSeconds: 600
+    minReadySeconds: 5
+    strategy:
+        type: RollingUpdate
+        rollingUpdate:
+            maxUnavailable: 0
+            maxSurge: 1
+    selector:
+        matchLabels:
+            app.kubernetes.io/name: api
+    template:
+        metadata:
+            labels:
+                app.kubernetes.io/name: api
+                app.kubernetes.io/part-of: demo-devops
+        spec:
+            serviceAccountName: demo-devops-api
+            automountServiceAccountToken: false
+            terminationGracePeriodSeconds: 30
+            securityContext:
+                runAsNonRoot: true
+                runAsUser: 1000
+                runAsGroup: 1000
+                fsGroup: 1000
+                seccompProfile:
+                    type: RuntimeDefault
+            topologySpreadConstraints:
+                - maxSkew: 1
+                  topologyKey: kubernetes.io/hostname
+                  whenUnsatisfiable: ScheduleAnyway
+                  labelSelector:
+                      matchLabels:
+                          app.kubernetes.io/name: api
+            initContainers:
+                - name: wait-for-db
+                  image: demo-devops-api:local
+                  imagePullPolicy: IfNotPresent
+                  command: ['node', 'scripts/wait-for-db.js']
+                  envFrom:
+                      - configMapRef:
+                            name: demo-devops-config
+                      - secretRef:
+                            name: demo-devops-db
+                  resources:
+                      requests:
+                          cpu: 10m
+                          memory: 32Mi
+                      limits:
+                          cpu: 100m
+                          memory: 64Mi
+                  securityContext:
+                      allowPrivilegeEscalation: false
+                      readOnlyRootFilesystem: true
+                      capabilities:
+                          drop:
+                              - ALL
+            containers:
+                - name: api
+                  image: demo-devops-api:local
+                  imagePullPolicy: IfNotPresent
+                  ports:
+                      - name: http
+                        containerPort: 8000
+                  envFrom:
+                      - configMapRef:
+                            name: demo-devops-config
+                      - secretRef:
+                            name: demo-devops-db
+                  startupProbe:
+                      httpGet:
+                          path: /health
+                          port: http
+                      periodSeconds: 2
+                      timeoutSeconds: 2
+                      failureThreshold: 30
+                  readinessProbe:
+                      httpGet:
+                          path: /ready
+                          port: http
+                      periodSeconds: 5
+                      timeoutSeconds: 3
+                      failureThreshold: 3
+                  livenessProbe:
+                      httpGet:
+                          path: /health
+                          port: http
+                      periodSeconds: 10
+                      timeoutSeconds: 3
+                      failureThreshold: 3
+                  lifecycle:
+                      preStop:
+                          exec:
+                              command: ['sh', '-c', 'sleep 5']
+                  resources:
+                      requests:
+                          cpu: 100m
+                          memory: 128Mi
+                      limits:
+                          cpu: 500m
+                          memory: 256Mi
+                  securityContext:
+                      allowPrivilegeEscalation: false
+                      readOnlyRootFilesystem: true
+                      capabilities:
+                          drop:
+                              - ALL
+                  volumeMounts:
+                      - name: tmp
+                        mountPath: /tmp
+            volumes:
+                - name: tmp
+                  emptyDir: {}

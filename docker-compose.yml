@@ -1,0 +1,69 @@
+name: demo-devops
+
+services:
+    postgres:
+        image: postgres:16.4-alpine
+        environment:
+            POSTGRES_DB: ${DB_NAME:-devops}
+            POSTGRES_USER: ${DB_USER:-devops}
+            POSTGRES_PASSWORD: ${DB_PASSWORD:-devops}
+        ports:
+            - '5432:5432'
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U ${DB_USER:-devops} -d ${DB_NAME:-devops}']
+            interval: 5s
+            timeout: 5s
+            retries: 10
+            start_period: 10s
+        restart: unless-stopped
+
+    app:
+        build:
+            context: .
+            args:
+                VERSION: local
+                VCS_REF: local
+                BUILD_DATE: local
+        environment:
+            NODE_ENV: production
+            PORT: 8000
+            HOST: 0.0.0.0
+            APP_VERSION: local
+            DB_DIALECT: postgres
+            DB_HOST: postgres
+            DB_PORT: 5432
+            DB_NAME: ${DB_NAME:-devops}
+            DB_USER: ${DB_USER:-devops}
+            DB_PASSWORD: ${DB_PASSWORD:-devops}
+            DB_SSL: 'false'
+            DB_LOGGING: 'false'
+        ports:
+            - '8000:8000'
+        depends_on:
+            postgres:
+                condition: service_healthy
+        command: ['sh', '-c', 'node scripts/migrate.js && node index.js']
+        healthcheck:
+            test:
+                [
+                    'CMD',
+                    'node',
+                    '-e',
+                    "fetch('http://127.0.0.1:8000/health').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))",
+                ]
+            interval: 10s
+            timeout: 3s
+            retries: 5
+            start_period: 20s
+        read_only: true
+        tmpfs:
+            - /tmp
+        security_opt:
+            - no-new-privileges:true
+        user: '1000:1000'
+        restart: unless-stopped
+
+volumes:
+    postgres-data:
