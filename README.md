@@ -330,11 +330,16 @@ Workflow: [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml)
 
 Every run produces:
 
-- **Public run URL:** `https://github.com/gerardoochoa98s/devsu-devops-challenge/actions`
+- **Validated run:** [CI/CD #40590810021](https://github.com/gerardoochoa98s/devsu-devops-challenge/actions/runs/40590810021)
+  — commit `eb0ed14`, all jobs green (`quality`, `CodeQL`, `build`, `deploy`).
 - **`coverage-report` artifact:** coverage HTML/LCOV/JSON + JUnit XML.
 - **`k8s-evidence` artifact:** smoke test, HPA, pods, ingress, PDB, NetworkPolicies, logs and events.
 - **Job summary:** coverage table and Kubernetes deployment summary.
 - **Security tab:** CodeQL and Trivy SARIF results.
+
+The validated run deployed two API replicas and passed the full HTTP smoke test through the ingress
+(`/health`, `/ready`, create/list/get, duplicate, validation, 404). HPA status and the PostgreSQL
+migration Job are captured in the `k8s-evidence` artifact.
 
 Selected evidence is also documented in [`docs/evidence/`](docs/evidence/).
 
@@ -530,15 +535,16 @@ checkov (soft fail)
 
 ## 9. Evidence
 
-| Evidence                       | Location                                                             |
-| ------------------------------ | -------------------------------------------------------------------- |
-| Pipeline runs                  | <https://github.com/gerardoochoa98s/devsu-devops-challenge/actions>  |
-| CI/CD workflow                 | [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml)         |
-| Terraform workflow             | [`.github/workflows/terraform.yml`](.github/workflows/terraform.yml) |
-| Coverage and JUnit reports     | `coverage-report` artifact of each run                               |
-| Kubernetes deployment evidence | `k8s-evidence` artifact of each run                                  |
-| Security findings              | GitHub Security tab (CodeQL + Trivy SARIF)                           |
-| Screenshots                    | [`docs/evidence/`](docs/evidence/)                                   |
+| Evidence                       | Location                                                                             |
+| ------------------------------ | ------------------------------------------------------------------------------------ |
+| Pipeline run (green)           | <https://github.com/gerardoochoa98s/devsu-devops-challenge/actions/runs/40590810021> |
+| All workflow runs              | <https://github.com/gerardoochoa98s/devsu-devops-challenge/actions>                  |
+| CI/CD workflow                 | [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml)                         |
+| Terraform workflow             | [`.github/workflows/terraform.yml`](.github/workflows/terraform.yml)                 |
+| Coverage and JUnit reports     | `coverage-report` artifact of the run above                                          |
+| Kubernetes deployment evidence | `k8s-evidence` artifact of the run above                                             |
+| Security findings              | GitHub Security tab (CodeQL + Trivy SARIF)                                           |
+| Screenshots                    | [`docs/evidence/`](docs/evidence/)                                                   |
 
 The deploy job writes a summary to the run page and captures:
 
