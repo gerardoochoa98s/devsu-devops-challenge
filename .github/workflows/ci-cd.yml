@@ -200,7 +200,7 @@ jobs:
               run: echo "IMAGE_NAME=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
 
             - name: Create kind cluster
-              uses: helm/kind-action@v1.10.0
+              uses: helm/kind-action@v1.15.1
               with:
                   cluster_name: demo-devops
                   config: .github/kind-config.yaml
